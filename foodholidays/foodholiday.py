@@ -1,11 +1,26 @@
 #!/usr/bin/env python3
+import argparse
 import datetime
 import sys
+
+def food_of_day_interval(month=None, day=None, interval=1):
+    now = datetime.datetime.now()
+    year = now.year
+    if not month:
+        month = now.month
+    if not day:
+        day = now.day
+    for counter in range(interval):
+        date = datetime.datetime(year=year,month=month, day=day) + datetime.timedelta(days=counter)
+        month0 = date.month
+        day0 = date.day
+        print(f"{date.strftime('%a')} {month0}/{day0} {food_of_day(month0, day0)}")
+
 def food_of_day(month=None, day=None):
     if month is None or day is None:
         now = datetime.datetime.now()
-        month = int(now.strftime('%m'))
-        day = int(now.strftime('%d'))
+        month = now.month
+        day = now.day
     return {
         (1,1): "National Bloody Mary Day",
         (1,2): "National Cream Puff Day",
@@ -376,12 +391,17 @@ def food_of_day(month=None, day=None):
         (12,31): "National Champagne Day"
     }[(month,day)]
 
+
 if __name__ == '__main__':
-    if len(sys.argv) > 3:
-        month = int(sys.argv[1])
-        day = int(sys.argv[2])
-    else:
+    parser = argparse.ArgumentParser(description='shows the national food of the days')
+    parser.add_argument('--day', default='today', help='starting day, default is today or 1/31')
+    parser.add_argument('--interval', default='7', help='number of days to show')
+    pargs = parser.parse_args()
+
+    if pargs.day == 'today':
         now = datetime.datetime.now()
-        month = int(now.strftime('%m'))
-        day = int(now.strftime('%d'))
-    print(f"{month}/{day} is {food_of_day(month,day)}")
+        month = now.month
+        day = now.day
+    else:
+        month,day = pargs.day.split('/')
+    food_of_day_interval(int(month), int(day), int(pargs.interval))
