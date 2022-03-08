@@ -1,0 +1,4 @@
+requests
+pytz
+tzdata
+tzlocal
