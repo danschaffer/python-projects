@@ -5,7 +5,7 @@ import datetime
 import pytz
 import requests
 import tzlocal
-class Nba:
+class Nhl:
     def __init__(self):
         pass
 
@@ -13,7 +13,7 @@ class Nba:
         _date = datetime.datetime.now() + datetime.timedelta(days=days)
         day = _date.strftime('%Y%m%d')
         datePrinted = False
-        data = requests.get(f"http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates={day}").json()
+        data = requests.get(f"http://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates={day}").json()
         for event in data['events']:
             if not datePrinted:
                 print(_date.strftime("%a %b %-d"))
@@ -22,13 +22,14 @@ class Nba:
                 clock = ''
             else:
                 clock = event['status']['displayClock']
+                period = event['status']['period']
             local_timezone = tzlocal.get_localzone()
             utc_time = datetime.datetime.strptime(event['date'], '%Y-%m-%dT%H:%MZ')
             local_time = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
             _tm = local_time.strftime("%-I:%M") + local_time.strftime("%p")[0].lower()
             score = ""
             teams = {}
-            if clock != '0.0':
+            if clock != '0:00':
                 competition = event['competitions'][0]
                 if competition['competitors'][0]['homeAway'] == 'home':
                     home = f"{competition['competitors'][0]['team']['shortDisplayName']}({competition['competitors'][0]['records'][0]['summary']}) {competition['competitors'][0]['score']}"
@@ -58,7 +59,7 @@ class Nba:
             self.get_schedule(count, verbose)
 
     def standings(self):
-        data = requests.get('http://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams').json()
+        data = requests.get('http://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams').json()
         print(data['sports'][0]['leagues'][0]['name'])
         standings = []
         for team in data['sports'][0]['leagues'][0]['teams']:
@@ -69,13 +70,13 @@ class Nba:
             for stat in team['team']['record']['items'][0]['stats']:
                 if stat['name'] == 'playoffSeed':
                     seed = int(stat['value'])
-                elif stat['name'] == 'gamesBehind':
-                    gamesBehind = int(stat['value'])
+                elif stat['name'] == 'points':
+                    points = int(stat['value'])
                 elif stat['name'] == 'winPercent':
                     winPercent = float(stat['value'])
-            standings.append({'name': name, 'record': record, 'winPercent': winPercent, 'seed': seed, 'gamesBehind': gamesBehind})
-        for team in sorted(standings, key=lambda k: k['winPercent'], reverse=True):
-            print(f"{team['name']:<14} {team['record']:<6} {int(100*team['winPercent']):<3} {team['gamesBehind']:<3} {team['seed']:<4}")
+            standings.append({'name': name, 'record': record, 'winPercent': winPercent, 'seed': seed, 'points': points})
+        for team in sorted(standings, key=lambda k: k['points'], reverse=True):
+            print(f"{team['name']:<14} {team['points']:<3} {team['record']:<6} {int(100*team['winPercent']):<3} {team['seed']:<4}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -87,8 +88,8 @@ if __name__ == '__main__':
     pargs = parser.parse_args()
     if not pargs.schedule and not pargs.standings:
         pargs.schedule = pargs.standings = True
-    soccer = Nba()
+    hockey = Nhl()
     if pargs.standings:
-        soccer.standings()
+        hockey.standings()
     if pargs.schedule:
-        soccer.schedules(pargs.start, pargs.end, pargs.verbose)
+        hockey.schedules(pargs.start, pargs.end, pargs.verbose)
