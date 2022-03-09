@@ -22,3 +22,7 @@ Nets(1-0) 123 at Lakers(1-0) 97, FINAL/OT
   Cam Thomas NETS 21 points
   Paul Mislap NET 10 rebounds
   Paul Mislap NETS 3 assists
+
+## football
+
+* scoreboard http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=2
