@@ -14,5 +14,11 @@ eng.1,ger.1,esp.1,fra.1,usa.1,mex.1,por.1,ned.1,ita.1,uefa.champions,uefa.europa
 
 ## basketball
 
-* scoreboard data is from http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard
+* scoreboard data is from http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20220308
 * standings data is from http://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams
+
+dates=20211003
+Nets(1-0) 123 at Lakers(1-0) 97, FINAL/OT
+  Cam Thomas NETS 21 points
+  Paul Mislap NET 10 rebounds
+  Paul Mislap NETS 3 assists
