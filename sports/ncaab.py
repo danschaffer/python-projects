@@ -13,7 +13,7 @@ class Nba:
         _date = datetime.datetime.now() + datetime.timedelta(days=days)
         day = _date.strftime('%Y%m%d')
         datePrinted = False
-        data = requests.get(f"http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates={day}").json()
+        data = requests.get(f"http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates={day}").json()
         for event in data['events']:
             if not datePrinted:
                 print(_date.strftime("%a %b %-d"))
@@ -59,11 +59,11 @@ class Nba:
             self.get_schedule(count, verbose)
 
     def standings(self):
-        data = requests.get('http://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams').json()
+        data = requests.get('http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams').json()
         print(data['sports'][0]['leagues'][0]['name'])
         standings = []
         for team in data['sports'][0]['leagues'][0]['teams']:
-            name = team['team']['name']
+            name = team['team']['nickname']
             if 'items' not in team['team']['record']:
                 continue
             record = team['team']['record']['items'][0]['summary']
@@ -76,7 +76,7 @@ class Nba:
                     winPercent = float(stat['value'])
             standings.append({'name': name, 'record': record, 'winPercent': winPercent, 'seed': seed, 'gamesBehind': gamesBehind})
         for team in sorted(standings, key=lambda k: k['winPercent'], reverse=True):
-            print(f"{team['name']:<14} {team['record']:<6} {int(100*team['winPercent']):<3} {team['gamesBehind']:<3} {team['seed']:<4}")
+            print(f"{team['name']:<20} {team['record']:<6} {int(100*team['winPercent']):<3} {team['gamesBehind']:<3} {team['seed']:<4}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

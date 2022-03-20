@@ -14,6 +14,14 @@ class Soccer:
             score += f" ({str(int(data['shootoutScore']))})"
         return score
 
+    def get_record(self, obj):
+        result = ''
+        if 'records' in obj and 'summary' in obj['records'][0]:
+            summary=obj['records'][0]['summary'].split('-')
+            points=int(summary[0])*3+int(summary[1])
+            result = f"({points}) "
+        return result
+
     def get_schedule(self, days, verbose):
         _date = datetime.datetime.now() + datetime.timedelta(days=days)
         day = _date.strftime('%Y%m%d')
@@ -37,11 +45,11 @@ class Soccer:
             if clock != "0'":
                 competition = event['competitions'][0]
                 if competition['competitors'][0]['homeAway'] == 'home':
-                    home = f"{competition['competitors'][0]['team']['shortDisplayName']} {self.get_score(competition['competitors'][0])}"
-                    away = f"{competition['competitors'][1]['team']['shortDisplayName']} {self.get_score(competition['competitors'][1])}"
+                    home = f"{competition['competitors'][0]['team']['shortDisplayName']}{self.get_record(competition['competitors'][0])} {self.get_score(competition['competitors'][0])}"
+                    away = f"{competition['competitors'][1]['team']['shortDisplayName']}{self.get_record(competition['competitors'][1])} {self.get_score(competition['competitors'][1])}"
                 else:
-                    away = f"{competition['competitors'][0]['team']['shortDisplayName']} {self.get_score(competition['competitors'][0])}"
-                    home = f"{competition['competitors'][1]['team']['shortDisplayName']} {self.get_score(competition['competitors'][1])}"
+                    away = f"{competition['competitors'][0]['team']['shortDisplayName']}{self.get_record(competition['competitors'][0])} {self.get_score(competition['competitors'][0])}"
+                    home = f"{competition['competitors'][1]['team']['shortDisplayName']}{self.get_record(competition['competitors'][1])} {self.get_score(competition['competitors'][1])}"
                 teams[competition['competitors'][0]['id']] = competition['competitors'][0]['team']['abbreviation']
                 teams[competition['competitors'][1]['id']] = competition['competitors'][1]['team']['abbreviation']
                 print(f"{away} at {home} {clock}")
@@ -57,11 +65,11 @@ class Soccer:
             else:
                 competition = event['competitions'][0]
                 if competition['competitors'][0]['homeAway'] == 'home':
-                    home = f"{competition['competitors'][0]['team']['shortDisplayName']}"
-                    away = f"{competition['competitors'][1]['team']['shortDisplayName']}"
+                    home = f"{competition['competitors'][0]['team']['shortDisplayName']}{self.get_record(competition['competitors'][0])}"
+                    away = f"{competition['competitors'][1]['team']['shortDisplayName']}{self.get_record(competition['competitors'][1])}"
                 else:
-                    away = f"{competition['competitors'][0]['team']['shortDisplayName']}"
-                    home = f"{competition['competitors'][1]['team']['shortDisplayName']}"
+                    away = f"{competition['competitors'][0]['team']['shortDisplayName']}{self.get_record(competition['competitors'][0])}"
+                    home = f"{competition['competitors'][1]['team']['shortDisplayName']}{self.get_record(competition['competitors'][1])}"
                 print(f"{away} at {home} {_tm}")
 
     def fixtures(self, start, end, verbose):
