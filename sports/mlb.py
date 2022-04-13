@@ -9,7 +9,7 @@ class Mlb:
     def __init__(self):
         pass
 
-    def get_schedule(self, days, verbose):
+    def get_schedule(self, days, verbose, teamsmatch):
         _date = datetime.datetime.now() + datetime.timedelta(days=days)
         day = _date.strftime('%Y%m%d')
         datePrinted = False
@@ -34,6 +34,8 @@ class Mlb:
             competition = event['competitions'][0]
             teams[competition['competitors'][0]['id']] = competition['competitors'][0]['team']['abbreviation']
             teams[competition['competitors'][1]['id']] = competition['competitors'][1]['team']['abbreviation']
+            if len(teamsmatch) > 0 and competition['competitors'][0]['team']['abbreviation'].lower() not in teamsmatch and competition['competitors'][1]['team']['abbreviation'].lower() not in teamsmatch:
+                continue
             if verbose:
                 if 'probables' in competition['competitors'][0]:
                     team = teams[competition['competitors'][0]['probables'][0]['athlete']['team']['id']]
@@ -48,6 +50,8 @@ class Mlb:
                         if stat['name'] == 'ERA':
                             era = stat['displayValue']
                     pitching += f"\n  {team} {name} {pos} {wins}-{losses} {era}"
+                    if len(competition['competitors']) < 2 or 'probables' not in competition['competitors'][1]:
+                        continue
                     team = teams[competition['competitors'][1]['probables'][0]['athlete']['team']['id']]
                     name = competition['competitors'][1]['probables'][0]['athlete']['displayName']
                     pos = competition['competitors'][1]['probables'][0]['athlete']['position']
@@ -86,7 +90,11 @@ class Mlb:
                                     losses = stat['displayValue']
                                 if stat['name'] == 'ERA':
                                     era = stat['displayValue']
-                            pitching += f"\n  {event} {team} {name} {pos} {wins}-{losses} {era}"
+                                if stat['name'] == 'saves':
+                                    saves = int(stat['displayValue'])
+                                    if saves == 0:
+                                        saves = ''
+                            pitching += f"\n  {event} {team} {name} {pos} {wins}-{losses} {era} {saves}"
                     for team in competition['competitors']:
                         if 'leaders' in team:
                             for leader in team['leaders']:
@@ -111,9 +119,13 @@ class Mlb:
                     home = f"{competition['competitors'][1]['team']['shortDisplayName']}({competition['competitors'][1]['records'][0]['summary']})"
                 print(f"{away} at {home} {_tm}{pitching}")
 
-    def schedules(self, start, end, verbose):
+    def schedules(self, start, end, verbose, teams):
+        if teams == '':
+            teams = []
+        else:
+            teams = teams.split(',')
         for count in range(start, end):
-            self.get_schedule(count, verbose)
+            self.get_schedule(count, verbose, teams)
 
     def standings(self):
         divisions = ['al east', 'al central', 'al west', 'nl east', 'nl central', 'nl west']
@@ -178,11 +190,12 @@ if __name__ == '__main__':
     parser.add_argument('--verbose', action='store_true', help='increase verbosity')
     parser.add_argument('--schedule', action='store_true', help='show schedule')
     parser.add_argument('--standings', action='store_true', help='show standings')
+    parser.add_argument('--teams', default='', help='teams')
     pargs = parser.parse_args()
     if not pargs.schedule and not pargs.standings:
         pargs.schedule = pargs.standings = True
-    soccer = Mlb()
+    mlb = Mlb()
     if pargs.standings:
-        soccer.standings()
+        mlb.standings()
     if pargs.schedule:
-        soccer.schedules(pargs.start, pargs.end, pargs.verbose)
+        mlb.schedules(pargs.start, pargs.end, pargs.verbose, pargs.teams)
