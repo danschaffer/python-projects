@@ -107,7 +107,7 @@ class Mlb:
                                         value = value[:-2]
                                     if len(value)>5:
                                         value = str(round(leader['leaders'][0]['value'],3))[1:]
-                                    print(f"  {team} {leader['displayName']} {value} {leader['leaders'][0]['athlete']['displayName']} {leader['leaders'][0]['athlete']['position']['abbreviation']} {leader['leaders'][0]['displayValue']}")
+                                    pitching += f"\n  {team} {leader['displayName']} {value} {leader['leaders'][0]['athlete']['displayName']} {leader['leaders'][0]['athlete']['position']['abbreviation']} {leader['leaders'][0]['displayValue']}"
                 print(f"{away} at {home} {inning} {clock}{pitching}")
             else:
                 competition = event['competitions'][0]

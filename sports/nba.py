@@ -47,11 +47,20 @@ class Nba:
             else:
                 competition = event['competitions'][0]
                 if competition['competitors'][0]['homeAway'] == 'home':
-                    home = f"{competition['competitors'][0]['team']['shortDisplayName']}({competition['competitors'][0]['records'][0]['summary']})"
-                    away = f"{competition['competitors'][1]['team']['shortDisplayName']}({competition['competitors'][1]['records'][0]['summary']})"
+                    homerecord = awayrecord = ''
+                    if 'records' in competition['competitors'][0]:
+                      homerecord = f"({competition['competitors'][0]['records'][0]['summary']})"   
+                    if 'records' in competition['competitors'][1]:
+                      awayrecord = f"({competition['competitors'][1]['records'][0]['summary']})"   
+                    home = f"{competition['competitors'][0]['team']['shortDisplayName']}{homerecord}"
+                    away = f"{competition['competitors'][1]['team']['shortDisplayName']}{awayrecord}"
                 else:
-                    away = f"{competition['competitors'][0]['team']['shortDisplayName']}({competition['competitors'][0]['records'][0]['summary']})"
-                    home = f"{competition['competitors'][1]['team']['shortDisplayName']}({competition['competitors'][1]['records'][0]['summary']})"
+                    if 'records' in competition['competitors'][1]:
+                      homerecord = "({competition['competitors'][1]['records'][0]['summary']})"   
+                    if 'records' in competition['competitors'][0]:
+                      awayrecord = "({competition['competitors'][0]['records'][0]['summary']})"   
+                    away = f"{competition['competitors'][0]['team']['shortDisplayName']}{awayrecord}"
+                    home = f"{competition['competitors'][1]['team']['shortDisplayName']}{homerecord}"
                 print(f"{away} at {home} {_tm}")
 
     def schedules(self, start, end, verbose):
