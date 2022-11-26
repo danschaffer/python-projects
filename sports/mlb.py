@@ -7,9 +7,41 @@ import requests
 import tzlocal
 class Mlb:
     def __init__(self):
-        pass
+       self.records = {}  # team: {'wins': '', 'losses': '', 'pct': ''}
+       self.teams = {
+            'Padres': 'nl west', 
+            'Astros': 'al west',
+            'Phillies': 'nl east', 
+            'Blue Jays': 'al east', 
+            'Cubs': 'nl central', 
+            'White Sox': 'al central', 
+            'Cardinals': 'nl central', 
+            'Mets': 'nl east', 
+            'Reds': 'nl central',
+            'Guardians': 'al central',
+            'Tigers': 'al central',
+            'Royals': 'al central',
+            'Twins': 'al central',
+            'Yankees': 'al east',
+            'Athletics': 'al west',
+            'Mariners': 'al west',
+            'Braves': 'nl east',
+            'Angels': 'al west',
+            'Nationals': 'nl east',
+            'Dodgers': 'nl west',
+            'Pirates': 'nl central',
+            'Orioles': 'al east',
+            'Red Sox': 'al east',
+            'Brewers': 'nl central',
+            'Rangers': 'al west',
+            'Rockies': 'nl west',
+            'Diamondbacks': 'nl west',
+            'Marlins': 'nl east',
+            'Giants': 'nl west',
+            'Rays': 'al east',
+        }
 
-    def get_schedule(self, days, verbose, teamsmatch):
+    def get_schedule(self, days, verbose=False, teamsmatch=[], quiet=False):
         _date = datetime.datetime.now() + datetime.timedelta(days=days)
         day = _date.strftime('%Y%m%d')
         datePrinted = False
@@ -18,12 +50,23 @@ class Mlb:
         for event in data['events']:
             pitching = ''
             if not datePrinted:
-                print(_date.strftime("%a %b %-d"))
+                if not quiet:
+                    print(_date.strftime("%a %b %-d"))
                 datePrinted =True
             if event['status']['type']['completed']:
                 clock = ''
                 inning = ''
                 start = ''
+                competition = event['competitions'][0]
+                for ct in range(2):
+                    name = competition['competitors'][ct]['team']['shortDisplayName']
+                    abbrev = competition['competitors'][ct]['team']['abbreviation']
+                    record = competition['competitors'][ct]['records'][0]['summary'].split('-')
+                    wins = int(record[0])
+                    losses = int(record[1])
+                    pct = wins / float(wins+losses)
+                    if name not in self.records.keys():
+                        self.records[name] = {"team": name, "wins": wins, "losses": losses, "pct": pct, "abbrev": abbrev}
             else:
                 clock = event['status']['displayClock']
                 inning = event['status']['period']
@@ -108,18 +151,19 @@ class Mlb:
                                     if len(value)>5:
                                         value = str(round(leader['leaders'][0]['value'],3))[1:]
                                     pitching += f"\n  {team} {leader['displayName']} {value} {leader['leaders'][0]['athlete']['displayName']} {leader['leaders'][0]['athlete']['position']['abbreviation']} {leader['leaders'][0]['displayValue']}"
-                print(f"{away} at {home} {inning} {clock}{pitching}")
+                if not quiet:
+                    print(f"{away} at {home} {inning} {clock}{pitching}")
             else:
-                competition = event['competitions'][0]
                 if competition['competitors'][0]['homeAway'] == 'home':
                     home = f"{competition['competitors'][0]['team']['shortDisplayName']}({competition['competitors'][0]['records'][0]['summary']})"
                     away = f"{competition['competitors'][1]['team']['shortDisplayName']}({competition['competitors'][1]['records'][0]['summary']})"
                 else:
                     away = f"{competition['competitors'][0]['team']['shortDisplayName']}({competition['competitors'][0]['records'][0]['summary']})"
                     home = f"{competition['competitors'][1]['team']['shortDisplayName']}({competition['competitors'][1]['records'][0]['summary']})"
-                print(f"{away} at {home} {_tm}{pitching}")
+                if not quiet:
+                    print(f"{away} at {home} {_tm}{pitching}")
 
-    def schedules(self, start, end, verbose, teams):
+    def schedules(self, start, end, verbose=False, teams=[]):
         if teams == '':
             teams = []
         else:
@@ -130,58 +174,23 @@ class Mlb:
     def standings(self):
         divisions = ['al east', 'al central', 'al west', 'nl east', 'nl central', 'nl west']
         standings = {'al east': [], 'al central': [], 'al west': [], 'nl east': [], 'nl central': [], 'nl west': []}
-        teams = {
-            'Padres': 'nl west', 
-            'Astros': 'al west',
-            'Phillies': 'nl east', 
-            'Blue Jays': 'al east', 
-            'Cubs': 'nl central', 
-            'White Sox': 'al central', 
-            'Cardinals': 'nl central', 
-            'Mets': 'nl east', 
-            'Reds': 'nl central',
-            'Guardians': 'al central',
-            'Tigers': 'al central',
-            'Royals': 'al central',
-            'Twins': 'al central',
-            'Yankees': 'al east',
-            'Athletics': 'al west',
-            'Mariners': 'al west',
-            'Braves': 'nl east',
-            'Angels': 'al west',
-            'Nationals': 'nl east',
-            'Dodgers': 'nl west',
-            'Pirates': 'nl east',
-            'Orioles': 'al east',
-            'Red Sox': 'al east',
-            'Brewers': 'nl central',
-            'Rangers': 'al west',
-            'Rockies': 'nl west',
-            'Diamondbacks': 'nl west',
-            'Marlins': 'nl east',
-            'Giants': 'nl west',
-            'Rays': 'al east',
-        }
-        for page in range(1,3):
-            data = requests.get(f"http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams?page={page}").json()
-            for team in data['sports'][0]['leagues'][0]['teams']:
-                name = team['team']['name']
-                print(name)
-                if 'items' not in team['team']['record']:
-                    continue
-                record = team['team']['record']['items'][0]['summary']
-                for stat in team['team']['record']['items'][0]['stats']:
-                    if stat['name'] == 'playoffSeed':
-                        seed = int(stat['value'])
-                    elif stat['name'] == 'divisionGamesBehind':
-                        gamesBehind = int(stat['value'])
-                    elif stat['name'] == 'winPercent':
-                        winPercent = float(stat['value'])
-                standings[teams[name]].append({'name': name, 'record': record, 'winPercent': winPercent, 'seed': seed, 'gamesBehind': gamesBehind})
+
+        self.records = {}
+        day = 0
+        while len(self.records.keys()) < len(self.teams.keys()):
+            self.get_schedule(day, quiet=True)
+            day -= 1
+        for team in self.teams:
+            division = self.teams[team]
+            standings[division].append(self.records[team])
         for division in divisions:
             print(division)
-            for team in sorted(standings[division], key=lambda k: k['winPercent'], reverse=True):
-                print(f"{team['name']:<14} {team['record']:<6} {int(100*team['winPercent']):<3} {team['gamesBehind']:<3} {team['seed']:<4}")
+            records = sorted(standings[division], key=lambda d: d['pct'], reverse=True)
+            wins1 = records[0]['wins']
+            losses1 = records[0]['losses']
+            for record in records:
+                gamesback = (wins1 - record['wins'] - losses1 + record['losses']) / 2.0
+                print(f"{record['abbrev']:3} {record['team']:14} {record['wins']:3} {record['losses']:3} {gamesback:4.1f} {record['pct']:.3f} {record['wins']+record['losses']:3}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -195,7 +204,7 @@ if __name__ == '__main__':
     if not pargs.schedule and not pargs.standings:
         pargs.schedule = pargs.standings = True
     mlb = Mlb()
-    if pargs.standings:
-        mlb.standings()
     if pargs.schedule:
         mlb.schedules(pargs.start, pargs.end, pargs.verbose, pargs.teams)
+    if pargs.standings:
+        mlb.standings()

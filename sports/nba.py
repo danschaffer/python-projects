@@ -7,9 +7,13 @@ import requests
 import tzlocal
 class Nba:
     def __init__(self):
-        pass
+        self.records={}
+        self.conferences = {
+            'Eastern': ['Hornets', 'Magic', '76ers', 'Knicks', 'Celtics', 'Pacers', 'Nets', 'Heat', 'Wizards', 'Hawks', 'Bucks', 'Cavaliers', 'Bulls', 'Pistons', 'Raptors'],
+            'Western': ['Timberwolves', 'Trail Blazers', 'Kings', 'Rockets', 'Grizzlies', 'Pelicans', 'Thunder', 'Spurs', 'Lakers', 'Suns', 'Warriors', 'Jazz', 'Clippers', 'Nuggets', 'Mavericks']
+        }
 
-    def get_schedule(self, days, verbose):
+    def get_schedule(self, days, verbose=False, silent=False):
         _date = datetime.datetime.now() + datetime.timedelta(days=days)
         day = _date.strftime('%Y%m%d')
         datePrinted = False
@@ -36,9 +40,12 @@ class Nba:
                 else:
                     away = f"{competition['competitors'][0]['team']['shortDisplayName']}({competition['competitors'][0]['records'][0]['summary']}) {competition['competitors'][1]['score']}"
                     home = f"{competition['competitors'][1]['team']['shortDisplayName']}({competition['competitors'][1]['records'][0]['summary']}) {competition['competitors'][0]['score']}"
+                self.add_record(competition['competitors'][0]['team']['shortDisplayName'], competition['competitors'][0]['records'][0]['summary'])
+                self.add_record(competition['competitors'][1]['team']['shortDisplayName'], competition['competitors'][1]['records'][0]['summary'])
                 teams[competition['competitors'][0]['id']] = competition['competitors'][0]['team']['abbreviation']
                 teams[competition['competitors'][1]['id']] = competition['competitors'][1]['team']['abbreviation']
-                print(f"{away} at {home} {clock}")
+                if not silent:
+                    print(f"{away} at {home} {clock}")
                 if verbose:
                     for team in competition['competitors']:
                         if 'leaders' in team:
@@ -61,36 +68,47 @@ class Nba:
                       awayrecord = "({competition['competitors'][0]['records'][0]['summary']})"   
                     away = f"{competition['competitors'][0]['team']['shortDisplayName']}{awayrecord}"
                     home = f"{competition['competitors'][1]['team']['shortDisplayName']}{homerecord}"
-                print(f"{away} at {home} {_tm}")
+                hometeam = competition['competitors'][0]['team']['shortDisplayName']
+                awayteam = competition['competitors'][1]['team']['shortDisplayName']
+                self.add_record(hometeam, homerecord)
+                self.add_record(awayteam, awayrecord)
+                if not silent:
+                    print(f"{away} at {home} {_tm}")
 
-    def schedules(self, start, end, verbose):
+    def add_record(self, team, record):
+        if record.startswith('('):
+            record = record[1:-1]
+        if team not in self.records:
+            tokens = record.split('-')
+            wins = int(tokens[0])
+            losses = int(tokens[1])
+            pct = wins / float(wins + losses)
+            self.records[team] = (team, pct, record)
+
+    def schedules(self, start, end, verbose, silent=False):
         for count in range(start, end):
             self.get_schedule(count, verbose)
 
-    def standings(self):
-        data = requests.get('http://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams').json()
-        print(data['sports'][0]['leagues'][0]['name'])
-        standings = []
-        for team in data['sports'][0]['leagues'][0]['teams']:
-            name = team['team']['name']
-            if 'items' not in team['team']['record']:
-                continue
-            record = team['team']['record']['items'][0]['summary']
-            for stat in team['team']['record']['items'][0]['stats']:
-                if stat['name'] == 'playoffSeed':
-                    seed = int(stat['value'])
-                elif stat['name'] == 'gamesBehind':
-                    gamesBehind = int(stat['value'])
-                elif stat['name'] == 'winPercent':
-                    winPercent = float(stat['value'])
-            standings.append({'name': name, 'record': record, 'winPercent': winPercent, 'seed': seed, 'gamesBehind': gamesBehind})
-        for team in sorted(standings, key=lambda k: k['winPercent'], reverse=True):
-            print(f"{team['name']:<14} {team['record']:<6} {int(100*team['winPercent']):<3} {team['gamesBehind']:<3} {team['seed']:<4}")
+    def standings(self, start):
+        while len(self.records) != 30:
+            start -= 1
+            self.schedules(start, start+1, verbose=False, silent=True)
+        for conf in self.conferences:
+            teams = []
+            for team in self.conferences[conf]:
+                teams.append(self.records[team])
+            print(conf)
+            teams.sort(key=lambda d: d[1],reverse=True)
+            for team in teams:
+                pct = f"{team[1]:.3}"
+                while len(pct) < 5:
+                    pct += '0'
+                print(f"{team[0]:15} {team[2]:10} {pct}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--start', type=int, default=-1, help="start number of days")
-    parser.add_argument('--end', type=int, default=1, help="end number of days")
+    parser.add_argument('--end', type=int, default=3, help="end number of days")
     parser.add_argument('--verbose', action='store_true', help='increase verbosity')
     parser.add_argument('--schedule', action='store_true', help='show schedule')
     parser.add_argument('--standings', action='store_true', help='show standings')
@@ -98,7 +116,7 @@ if __name__ == '__main__':
     if not pargs.schedule and not pargs.standings:
         pargs.schedule = pargs.standings = True
     soccer = Nba()
-    if pargs.standings:
-        soccer.standings()
     if pargs.schedule:
         soccer.schedules(pargs.start, pargs.end, pargs.verbose)
+    if pargs.standings:
+        soccer.standings(pargs.start)
