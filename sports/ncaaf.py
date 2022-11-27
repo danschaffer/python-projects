@@ -13,7 +13,7 @@ class Ncaab:
         _date = datetime.datetime.now() + datetime.timedelta(days=days)
         day = _date.strftime('%Y%m%d')
         datePrinted = False
-        data = requests.get(f"http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates={day}").json()
+        data = requests.get(f"http://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates={day}").json()
         for event in data['events']:
             if not datePrinted:
                 print(_date.strftime("%a %b %-d"))
@@ -31,13 +31,9 @@ class Ncaab:
             if clock != '0.0':
                 competition = event['competitions'][0]
                 name0 = competition['competitors'][0]['team']['location']
-                rank0 = 99
-                if 'curatedRank' in competition['competitors'][0]:
-                    rank0 = competition['competitors'][0]['curatedRank']['current']
+                rank0 = competition['competitors'][0]['curatedRank']['current']
                 name1 = competition['competitors'][1]['team']['location']
-                rank1 = 99
-                if 'curatedRank' in competition['competitors'][1]:
-                    rank1 = competition['competitors'][1]['curatedRank']['current']
+                rank1 = competition['competitors'][1]['curatedRank']['current']
                 if rank0 < 26:
                     name0 += f"({rank0})"
                 if rank1 < 26:
@@ -48,24 +44,18 @@ class Ncaab:
                 else:
                     away = f"{name0}({competition['competitors'][0]['records'][0]['summary']}) {competition['competitors'][1]['score']}"
                     home = f"{name1}({competition['competitors'][1]['records'][0]['summary']}) {competition['competitors'][0]['score']}"
-                teams[competition['competitors'][0]['id']] = competition['competitors'][0]['team']['abbreviation']
-                teams[competition['competitors'][1]['id']] = competition['competitors'][1]['team']['abbreviation']
+                teams[competition['competitors'][0]['id']] = competition['competitors'][0]['team']['displayName']
+                teams[competition['competitors'][1]['id']] = competition['competitors'][1]['team']['displayName']
                 print(f"{away} at {home} {clock}")
                 if verbose:
                     for team in competition['competitors']:
                         if 'leaders' in team:
                             for leader in team['leaders']:
-                                print(f"  {teams[leader['leaders'][0]['athlete']['team']['id']]} {leader['shortDisplayName']} {leader['leaders'][0]['athlete']['displayName']} {leader['leaders'][0]['displayValue']}")
+                                print(f"  {teams[leader['leaders'][0]['athlete']['team']['id']]} {leader['displayName']} {leader['leaders'][0]['athlete']['displayName']} {leader['leaders'][0]['displayValue']}")
             else:
                 competition = event['competitions'][0]
                 name0 = competition['competitors'][0]['team']['location']
-                rank0 = 99
-                if 'curatedRank' in competition['competitors'][0]:
-                    rank0 = competition['competitors'][0]['curatedRank']['current']
                 name1 = competition['competitors'][1]['team']['location']
-                rank1 = 99
-                if 'curatedRank' in competition['competitors'][1]:
-                    rank1 = competition['competitors'][1]['curatedRank']['current']
                 if rank0 < 26:
                     name0 += f"({rank0})"
                 if rank1 < 26:
@@ -84,7 +74,7 @@ class Ncaab:
 
     def standings(self):
         print("Rankings")
-        data = requests.get(f"http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/rankings").json()
+        data = requests.get(f"http://site.api.espn.com/apis/site/v2/sports/football/college-football/rankings").json()
         for team in data['rankings'][0]['ranks']:
             print(f"{team['current']:2} {team['trend']:4} {team['team']['abbreviation']:4} {team['team']['nickname']:15} {team['recordSummary']:10}")
 
