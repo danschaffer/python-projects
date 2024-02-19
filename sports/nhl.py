@@ -83,7 +83,7 @@ class Nhl:
     def standings(self, start):
         while len(self.records) < 32:
             start -= 1
-            self.schedules(start, start-1, verbose=False, silent=True)
+            self.schedules(start, start+1, verbose=False, silent=True)
         for divi in self.divisions:
             print(divi)
             teams = []

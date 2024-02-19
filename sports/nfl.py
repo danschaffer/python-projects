@@ -49,6 +49,7 @@ class Nfl:
         datePrinted = False
         data = requests.get(f"http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates={day}").json()
         for event in data['events']:
+            record1 = record2 = None
             if not datePrinted:
                 if not quiet:
                     print(f"{day[0:4]}-{day[4:6]}-{day[6:8]}")
@@ -57,12 +58,12 @@ class Nfl:
             team1 = event['competitions'][0]['competitors'][0]['team']['abbreviation'].lower()
             score1 = int(event['competitions'][0]['competitors'][0]['score'])
             for record in event['competitions'][0]['competitors'][0]['records']:
-                if record['name'] == 'All Splits' or record['name'].lower() == 'ytd':
+                if record['name'] == 'All Splits' or record['name'].lower() == 'ytd' or record['name'] == 'overall':
                     record1 = record['summary']
             team2 = event['competitions'][0]['competitors'][1]['team']['abbreviation'].lower()
             score2 = int(event['competitions'][0]['competitors'][1]['score'])
             for record in event['competitions'][0]['competitors'][1]['records']:
-                if record['name'] == 'All Splits' or record['name'].lower() == 'ytd':
+                if record['name'] == 'All Splits' or record['name'].lower() == 'ytd' or record['name'] == 'overall':
                     record2 = record['summary']
             if team1 not in self.records:
                 self.records[team1] = record1
@@ -116,7 +117,7 @@ class Nfl:
 
     def get_week(self, week):
         result = []
-        start = datetime.datetime(2022, 9, 7)
+        start = datetime.datetime(2023, 9, 7)
         for i in range(7):
             result.append((start + datetime.timedelta(days=(week-1)*7+i)).strftime("%Y%m%d"))
         if week == 1:
@@ -148,6 +149,9 @@ if __name__ == '__main__':
         week = nfl.get_week_from_day()
     else:
         week = int(pargs.week)
+    if not week:
+        print("season is over")
+        sys.exit(1)
     print(f"week {week}")
     if pargs.schedule:
         nfl.schedules(week, verbose=pargs.verbose, teams=pargs.teams, quiet=False)

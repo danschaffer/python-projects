@@ -125,6 +125,8 @@ class Soccer:
                 if self.track_fixtures:
                     self.fixtures_data.append(f"{daystr} {away} at {home} {_tm}")
             for competitor in event['competitions'][0]['competitors']:
+                if 'records' not in competitor:
+                    break
                 record = competitor['records'][0]['summary']
                 team = competitor['team']['name']
                 tokens = record.split('-')
