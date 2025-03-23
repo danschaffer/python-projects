@@ -1,4 +1,13 @@
-requests
-pytz
-tzdata
-tzlocal
+# Core dependencies
+requests>=2.31.0
+pytz>=2024.1
+tzlocal>=5.2
+
+# Progress bars
+tqdm>=4.66.2
+
+# Testing
+pytest>=8.0.0
+
+# Type checking
+typing-extensions>=4.9.0

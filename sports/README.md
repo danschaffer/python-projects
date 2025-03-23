@@ -1,3 +1,91 @@
+# Soccer Stats Viewer
+
+A command-line tool for viewing soccer fixtures and standings from various leagues using the ESPN API.
+
+## Features
+
+- View fixtures and standings for multiple soccer leagues
+- Filter results by team name
+- Multiple output formats (text, JSON, CSV)
+- Cached API responses for better performance
+- Detailed match information
+- Support for multiple time zones
+- Error handling and logging
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd sports
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+Basic usage:
+```bash
+# View EPL fixtures and standings (default)
+python -m soccer
+
+# View specific league
+python -m soccer --league esp.1
+
+# View specific team
+python -m soccer --team "Arsenal"
+
+# View fixtures only
+python -m soccer --fixtures
+
+# View standings only
+python -m soccer --standings
+
+# List available leagues
+python -m soccer --list-leagues
+```
+
+Advanced options:
+```bash
+# Custom date range (days relative to today)
+python -m soccer --start -7 --end 14
+
+# Output in JSON format
+python -m soccer --format json
+
+# Output in CSV format
+python -m soccer --format csv
+
+# Show detailed match information
+python -m soccer --verbose
+
+# Enable debug logging
+python -m soccer --debug
+```
+
+## Supported Leagues
+
+- Major European Leagues (EPL, La Liga, Bundesliga, Serie A, Ligue 1)
+- Other European Leagues (Eredivisie, Primeira Liga, Belgian Pro League)
+- English Leagues (Championship, League One, FA Cup, League Cup)
+- European Competitions (Champions League, Europa League)
+- Americas (MLS, Liga MX, Brasileirão, Primera División)
+- Others (J-League, Copa del Rey)
+
+## Development
+
+Run tests:
+```bash
+pytest tests/
+```
+
+## License
+
+MIT License
+
 * sports
 ## summary
 Some cli sports scores showing standings and current results using the espn hidden apis.
