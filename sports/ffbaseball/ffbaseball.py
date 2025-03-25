@@ -76,7 +76,7 @@ def matchup(ctx):
         print("\n" + "="*50)
 
 @cli.command()
-@click.option('--team-id', type=int, help='Team ID to show stats for')
+@click.option('--team-id', type=int, default=7, help='Team ID to show stats for')
 @click.pass_context
 def team(ctx, team_id: Optional[int]):
     """Display team summary and player statistics"""
@@ -96,20 +96,16 @@ def team(ctx, team_id: Optional[int]):
     if not player_stats.empty:
         # Format numeric columns
         for col in player_stats.columns:
-            if col in ['AVG', 'OBP', 'SLG', 'OPS', 'ERA', 'WHIP', 'K/9', 'K/BB']:
+            if col in ['ERA', 'WHIP', 'K/9', 'K/BB']:
                 player_stats[col] = player_stats[col].apply(lambda x: f"{float(x):.3f}" if pd.notnull(x) else "0.000")
-            elif col in ['HR', 'RBI', 'R', 'SB', 'W', 'L', 'SV', 'HLD', 'K', 'QS']:
-                player_stats[col] = player_stats[col].apply(lambda x: f"{int(x)}" if pd.notnull(x) else "0")
-        
-        # Convert boolean Injured column to Yes/No
-        player_stats['Injured'] = player_stats['Injured'].map({True: 'Yes', False: 'No'})
+            elif col in ['AVG', 'OBP', 'SLG', 'OPS', 'HR', 'RBI', 'R', 'SB']:
+                player_stats[col] = player_stats[col].apply(lambda x: f"{float(x)}" if pd.notnull(x) else "0")
         
         # Set column widths
         col_widths = {
             'Player': 20,
             'Position': 8,
             'Pro Team': 8,
-            'Eligible Positions': 20,
             'Injury Status': 12
         }
         
@@ -120,8 +116,7 @@ def team(ctx, team_id: Optional[int]):
         
         # Display columns in order
         display_columns = [
-            'Player', 'Position', 'Pro Team', 'Eligible Positions', 
-            'Injured', 'Injury Status'
+            'Player', 'Position', 'Pro Team', 'Injury Status'
         ]
         
         # Add any additional stat columns that exist
@@ -224,9 +219,6 @@ def free_agents(ctx, position: Optional[str], season: int):
     stat_cols = [col for col in free_agents.columns if col not in col_widths.keys()]
     for col in stat_cols:
         col_widths[col] = 6
-    
-    # Convert boolean Injured column to Yes/No
-    free_agents['Injured'] = free_agents['Injured'].map({True: 'Yes', False: 'No'})
     
     print(f"\nBest Available{f' {position}' if position else ''} Players ({season} Season):")
     print(tabulate(
