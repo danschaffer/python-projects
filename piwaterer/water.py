@@ -11,7 +11,7 @@ class Waterer:
         self.pump_gpio = 17
         self.pump = LED(self.pump_gpio)
         self.pump.off()
-        self.valves_gpio = [22, 4, 27, 17]
+        self.valves_gpio = [22, 4, 27]
         self.valves = [LED(n) for n in self.valves_gpio]
         self.turn_all_valves_off()
 
