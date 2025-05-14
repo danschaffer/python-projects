@@ -14,15 +14,17 @@ class Waterer:
         self.valves_gpio = [22, 4, 27]
         self.valves = [LED(n) for n in self.valves_gpio]
         self.turn_all_valves_off()
+        self.log('System initialized')
 
     def turn_all_valves_off(self):
         """Turn off all valves"""
         for valve in self.valves:
             valve.off()
+        self.log('All valves turned off')
 
     def water(self, nvalve, secs, log):
         if log:
-            self.log('starting water valve ' + str(nvalve) + ' for ' + str(secs) + 's')
+            self.log(f'Starting water valve {nvalve} for {secs}s')
         assert nvalve in [0, 1, 2], 'valve must be 0,1,2'
         
         # Ensure all valves are off before starting
@@ -30,22 +32,30 @@ class Waterer:
         
         # Turn on the selected valve
         valve = self.valves[nvalve]
+        if log:
+            self.log(f'Turning on valve {nvalve} (GPIO {self.valves_gpio[nvalve]})')
         valve.on()
         time.sleep(0.5)
         
         # Turn on pump
+        if log:
+            self.log('Turning on pump')
         self.pump.on()
         time.sleep(secs)
         
         # Turn off pump and valve
+        if log:
+            self.log('Turning off pump')
         self.pump.off()
+        if log:
+            self.log(f'Turning off valve {nvalve}')
         valve.off()
         
         # Double check all valves are off
         self.turn_all_valves_off()
         
         if log:
-           self.log('completed water valve ' + str(nvalve) + ' for ' + str(secs) + 's')
+           self.log(f'Completed water valve {nvalve} for {secs}s')
 
     def log(self, message):
         ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

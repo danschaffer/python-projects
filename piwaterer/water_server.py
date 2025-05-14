@@ -120,6 +120,14 @@ def update_schedule():
     
     return redirect(url_for('index'))
 
+@app.route('/test_valve/<int:valve>', methods=['GET'])
+def test_valve(valve):
+    if valve in [0, 1, 2]:
+        log_watering_event(f"Testing valve {valve}")
+        waterer.water(valve, 5, True)  # Run for 5 seconds
+        return jsonify({'status': 'success', 'message': f'Tested valve {valve}'})
+    return jsonify({'status': 'error', 'message': 'Invalid valve number'})
+
 # Initialize schedules on startup
 setup_schedules()
 
