@@ -34,9 +34,9 @@
                         <div class="col-md-6">
                             <label for="valve" class="form-label">Select Valve</label>
                             <select class="form-select" id="valve" name="valve" required>
-                                <option value="0">Valve 1</option>
-                                <option value="1">Valve 2</option>
-                                <option value="2">Valve 3</option>
+                                <option value="0">Valve 0</option>
+                                <option value="1">Valve 1</option>
+                                <option value="2">Valve 2</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -66,17 +66,17 @@
                             <input type="hidden" name="period" value="morning">
                             <input type="hidden" name="time" value="09:00">
                             <div class="mb-3">
-                                <label class="form-label">Valve 1 Duration (seconds)</label>
+                                <label class="form-label">Valve 0 Duration (seconds)</label>
                                 <input type="number" class="form-control" name="duration_0" 
                                        value="{{ schedule.morning.durations[0] }}" min="0" max="300">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Valve 2 Duration (seconds)</label>
+                                <label class="form-label">Valve 1 Duration (seconds)</label>
                                 <input type="number" class="form-control" name="duration_1" 
                                        value="{{ schedule.morning.durations[1] }}" min="0" max="300">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Valve 3 Duration (seconds)</label>
+                                <label class="form-label">Valve 2 Duration (seconds)</label>
                                 <input type="number" class="form-control" name="duration_2" 
                                        value="{{ schedule.morning.durations[2] }}" min="0" max="300">
                             </div>
@@ -88,17 +88,17 @@
                             <input type="hidden" name="period" value="evening">
                             <input type="hidden" name="time" value="18:00">
                             <div class="mb-3">
-                                <label class="form-label">Valve 1 Duration (seconds)</label>
+                                <label class="form-label">Valve 0 Duration (seconds)</label>
                                 <input type="number" class="form-control" name="duration_0" 
                                        value="{{ schedule.evening.durations[0] }}" min="0" max="300">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Valve 2 Duration (seconds)</label>
+                                <label class="form-label">Valve 1 Duration (seconds)</label>
                                 <input type="number" class="form-control" name="duration_1" 
                                        value="{{ schedule.evening.durations[1] }}" min="0" max="300">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Valve 3 Duration (seconds)</label>
+                                <label class="form-label">Valve 2 Duration (seconds)</label>
                                 <input type="number" class="form-control" name="duration_2" 
                                        value="{{ schedule.evening.durations[2] }}" min="0" max="300">
                             </div>
