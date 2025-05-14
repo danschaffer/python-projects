@@ -63,21 +63,19 @@
                         <!-- Morning Schedule -->
                         <div class="col-md-6 mb-4">
                             <h6>Morning Schedule (9:00 AM)</h6>
-                            <input type="hidden" name="period" value="morning">
-                            <input type="hidden" name="time" value="09:00">
                             <div class="mb-3">
                                 <label class="form-label">Valve 0 Duration (seconds)</label>
-                                <input type="number" class="form-control" name="duration_0" 
+                                <input type="number" class="form-control" name="morning_duration_0" 
                                        value="{{ schedule.morning.durations[0] }}" min="0" max="300">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Valve 1 Duration (seconds)</label>
-                                <input type="number" class="form-control" name="duration_1" 
+                                <input type="number" class="form-control" name="morning_duration_1" 
                                        value="{{ schedule.morning.durations[1] }}" min="0" max="300">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Valve 2 Duration (seconds)</label>
-                                <input type="number" class="form-control" name="duration_2" 
+                                <input type="number" class="form-control" name="morning_duration_2" 
                                        value="{{ schedule.morning.durations[2] }}" min="0" max="300">
                             </div>
                         </div>
@@ -85,21 +83,19 @@
                         <!-- Evening Schedule -->
                         <div class="col-md-6 mb-4">
                             <h6>Evening Schedule (6:00 PM)</h6>
-                            <input type="hidden" name="period" value="evening">
-                            <input type="hidden" name="time" value="18:00">
                             <div class="mb-3">
                                 <label class="form-label">Valve 0 Duration (seconds)</label>
-                                <input type="number" class="form-control" name="duration_0" 
+                                <input type="number" class="form-control" name="evening_duration_0" 
                                        value="{{ schedule.evening.durations[0] }}" min="0" max="300">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Valve 1 Duration (seconds)</label>
-                                <input type="number" class="form-control" name="duration_1" 
+                                <input type="number" class="form-control" name="evening_duration_1" 
                                        value="{{ schedule.evening.durations[1] }}" min="0" max="300">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Valve 2 Duration (seconds)</label>
-                                <input type="number" class="form-control" name="duration_2" 
+                                <input type="number" class="form-control" name="evening_duration_2" 
                                        value="{{ schedule.evening.durations[2] }}" min="0" max="300">
                             </div>
                         </div>

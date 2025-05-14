@@ -102,21 +102,21 @@ def water():
 @app.route('/update_schedule', methods=['POST'])
 def update_schedule():
     schedule = load_schedule()
-    period = request.form.get('period')
-    time = request.form.get('time')
-    durations = [
-        int(request.form.get(f'duration_{i}', 60))
-        for i in range(3)
-    ]
     
-    if period in ['morning', 'evening']:
+    # Update both morning and evening schedules
+    for period in ['morning', 'evening']:
+        durations = [
+            int(request.form.get(f'{period}_duration_{i}', 60))
+            for i in range(3)
+        ]
         schedule[period] = {
-            'time': time,
+            'time': '09:00' if period == 'morning' else '18:00',
             'durations': durations
         }
-        save_schedule(schedule)
-        setup_schedules()
-        log_watering_event(f"Schedule updated for {period} period")
+    
+    save_schedule(schedule)
+    setup_schedules()
+    log_watering_event("Schedule updated for both morning and evening periods")
     
     return redirect(url_for('index'))
 
