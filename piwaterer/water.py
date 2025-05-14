@@ -11,8 +11,12 @@ class Waterer:
         self.pump_gpio = 17
         self.pump = LED(self.pump_gpio)
         self.pump.off()
-        self.valves_gpio = [22, 4, 27]
+        self.valves_gpio = [22, 4, 27, 17]
         self.valves = [LED(n) for n in self.valves_gpio]
+        self.turn_all_valves_off()
+
+    def turn_all_valves_off(self):
+        """Turn off all valves"""
         for valve in self.valves:
             valve.off()
 
@@ -20,13 +24,26 @@ class Waterer:
         if log:
             self.log('starting water valve ' + str(nvalve) + ' for ' + str(secs) + 's')
         assert nvalve in [0, 1, 2], 'valve must be 0,1,2'
+        
+        # Ensure all valves are off before starting
+        self.turn_all_valves_off()
+        
+        # Turn on the selected valve
         valve = self.valves[nvalve]
         valve.on()
         time.sleep(0.5)
+        
+        # Turn on pump
         self.pump.on()
         time.sleep(secs)
+        
+        # Turn off pump and valve
         self.pump.off()
-        valve.off() 
+        valve.off()
+        
+        # Double check all valves are off
+        self.turn_all_valves_off()
+        
         if log:
            self.log('completed water valve ' + str(nvalve) + ' for ' + str(secs) + 's')
 
